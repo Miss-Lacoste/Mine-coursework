@@ -1,0 +1,556 @@
+import webbrowser #импортируем модули и библиотеку
+from telebot import types
+import telebot
+import random
+
+bot = telebot.TeleBot('') #вставляем токен бота
+memory = {} #память бота, в словаре id пользователя в ключе, и его ответ в значении
+
+
+@bot.message_handler(commands=["site", "website"]) # пропишем декоратор для команды перехода на сайт
+def site(message):
+    webbrowser.open("https://espanol.online/lexic/by_theme?language=ru") #ссылка на сайт
+
+
+@bot.message_handler(commands=['start', 'hello', 'help']) #пропишем декоратор для обработки команд
+def main(message):
+    bot.send_message(message.chat.id, f"¡Hola, {message.from_user.first_name}!") #обращение к id чата и id пользователя
+    bot.send_photo(message.chat.id, 'https://flomaster.top/uploads/posts/2022-12/1672269174_flomaster-club-p-vinni-pukh-risunok-dlya-detei-vkontakte-49.png')
+    keyboard = types.InlineKeyboardMarkup() #начинаем операцию по внедрению встроенных кнопок
+    key_get_acquainted = types.InlineKeyboardButton(text='Small talk', callback_data='get_acquainted')
+    keyboard.add(key_get_acquainted)
+    key_site = types.InlineKeyboardButton(text='Website', url="https://espanol.online/lexic/by_theme?language=ru")
+    keyboard.add(key_site)
+    key_starting = types.InlineKeyboardButton(text="Start learning", callback_data="starting")
+    keyboard.add(key_starting)
+    bot.send_message(message.from_user.id, text="Choose the action", reply_markup=keyboard)
+
+
+@bot.message_handler(content_types=["text"]) #обработка текстового сообщения, введенного пользователем
+def get_text_message(message):
+    if message.text.lower() == "привет":
+        bot.send_message(message.chat.id, f"¡Buenas, {message.from_user.first_name}!")
+        bot.send_photo(message.chat.id,'https://flomaster.top/uploads/posts/2022-12/1672269174_flomaster-club-p-vinni-pukh-risunok-dlya-detei-vkontakte-49.png')
+        keyboard = types.InlineKeyboardMarkup()
+        key_get_acquainted = types.InlineKeyboardButton(text='Small talk', callback_data='get_acquainted')
+        keyboard.add(key_get_acquainted)
+        key_site = types.InlineKeyboardButton(text='Website', url="https://espanol.online/lexic/by_theme?language=ru")
+        keyboard.add(key_site)
+        key_starting = types.InlineKeyboardButton(text="Start learning", callback_data="starting")
+        keyboard.add(key_starting)
+        bot.send_message(message.from_user.id, text="Choose the action", reply_markup=keyboard)
+
+
+@bot.callback_query_handler(func=lambda callback: True) #обработчик кнопки
+def callback_message(callback):
+    if callback.data == "starting":
+        keyboard_a = types.InlineKeyboardMarkup()
+        key_fruits = types.InlineKeyboardButton(text='Fruits', callback_data='fruits')
+        keyboard_a.add(key_fruits)
+        key_vegetables = types.InlineKeyboardButton(text='Vegetables', callback_data='vegetables')
+        keyboard_a.add(key_vegetables)
+        key_animals = types.InlineKeyboardButton(text='Animals', callback_data='animals')
+        keyboard_a.add(key_animals)
+        key_weather = types.InlineKeyboardButton(text='Weather', callback_data='weather')
+        keyboard_a.add(key_weather)
+        key_weekdays = types.InlineKeyboardButton(text='Days of week', callback_data='weekdays')
+        keyboard_a.add(key_weekdays)
+        key_colours = types.InlineKeyboardButton(text='Colours', callback_data='colours')
+        keyboard_a.add(key_colours)
+        bot.send_message(callback.from_user.id, text="Choose the topic", reply_markup=keyboard_a)
+    if callback.data == 'get_acquainted':
+        keyboard_a = types.InlineKeyboardMarkup()
+        key_wonderful = types.InlineKeyboardButton(text='¡Gracias!', callback_data='wonderful')
+        keyboard_a.add(key_wonderful)
+        key_gloomy = types.InlineKeyboardButton(text='Ni fu ni fa...', callback_data='gloomy')
+        keyboard_a.add(key_gloomy)
+        bot.send_message(callback.from_user.id, text='¿Cómo está?', reply_markup=keyboard_a)
+    if callback.data == 'wonderful':
+        keyboard_a = types.InlineKeyboardMarkup()
+        bot.send_message(callback.from_user.id, "¡Fenomenal!", reply_markup=keyboard_a)
+        bot.send_photo(callback.from_user.id, 'https://avatars.mds.yandex.net/i?id=e462852b1ad3a4e40e0376e8b82b21a406e5762d-10638828-images-thumbs&n=13')
+    if callback.data == 'gloomy':
+        keyboard_a = types.InlineKeyboardMarkup()
+        bot.send_message(callback.from_user.id, '¡No te preocupes! ¡Todo va a ir bien!', reply_markup=keyboard_a)
+        bot.send_photo(callback.from_user.id, 'https://avatars.mds.yandex.net/i?id=dfe4d51434162d24dcbd0b5c0b4390155f4d4ae5-4986689-images-thumbs&n=13')
+    if callback.data == 'animals':
+        keyboard_a = types.InlineKeyboardMarkup()
+        key_pets = types.InlineKeyboardButton(text='Pets', callback_data='pets')
+        keyboard_a.add(key_pets)
+        key_domestic_animals = types.InlineKeyboardButton(text='Domestic animals', callback_data='domestic_animals')
+        keyboard_a.add(key_domestic_animals)
+        key_wild_animals = types.InlineKeyboardButton(text='Wild animals', callback_data='wild_animals')
+        keyboard_a.add(key_wild_animals)
+        key_exotic_animals = types.InlineKeyboardButton(text='Exotic animals', callback_data='exotic_animals')
+        keyboard_a.add(key_exotic_animals)
+        bot.send_message(callback.from_user.id, text="Choose the subtopic", reply_markup=keyboard_a)
+    elif callback.data == 'fruits': #словарь загадок
+        tasks = [{'question': 'la manzana is...',
+                  'answers': ['Apple', 'Pear', 'Cherry', 'Banana'],
+                  'right_answer': '1'},
+                 {'question': 'la pera is...',
+                  'answers': ['Apple', 'Pear', 'Mango', 'Kiwi'],
+                  'right_answer': '2'},
+                 {'question': 'la ciruela is...',
+                  'answers': ['Plum', 'Orange', 'Grapes', 'Raspberry'],
+                  'right_answer': '1'},
+
+                 {'question': 'el limón is...',
+                  'answers': ['Mango', 'lemon', 'Strawberry', 'Black сurrant'],
+                  'right_answer': '2'},
+
+                 {'question': 'la piña is...',
+                  'answers': ['Tangerine', 'Kiwi', 'Pineapple', 'Banana'],
+                  'right_answer': '3'},
+
+                 {'question': 'la uva is...',
+                  'answers': ['Blackberry', 'Grapes', 'Date', 'Watermelon'],
+                  'right_answer': '2'},
+
+                 {'question': 'la mora is...',
+                  'answers': ['Blackberry', 'Melon', 'Coconut', 'Kiwi'],
+                  'right_answer': '1'},
+
+                 {'question': 'el coco is...',
+                  'answers': ['Mango', 'Fig', 'Coconut', 'Apple'],
+                  'right_answer': '3'},
+
+                 {'question': 'el higo is...',
+                  'answers': ['Abricot', 'Apple', 'Pear', 'Fig'],
+                  'right_answer': '4'},
+
+                 {'question': 'el dátil is...',
+                  'answers': ['Date', 'Fig', 'Pear', 'Banana'],
+                  'right_answer': '1'},
+
+                 {'question': 'el durazno is...',
+                  'answers': ['Grapes', 'Melon', 'Peach', 'Cherry'],
+                  'right_answer': '3'},
+
+                 {'question': 'el plátano is...',
+                  'answers': ['Grapes', 'Kiwi', 'Banana', 'Reddish'],
+                  'right_answer': '3'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)): #кнопки, добавляющиеся в цикле
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1)) #название кнопки для вариантов ответа
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id #id того пользователя, кто пишет. Ключ словаря memory, котрый дает кортеж из темы и ответа пользователя
+        memory[user_id] = ('fruits', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'vegetables':
+        tasks = [{'question': 'la zanahoria is...',
+                  'answers': ['Carrot', 'Cabbage', 'Сauliflower'],
+                  'right_answer': '1'},
+                 {'question': 'el calabacín is...',
+                  'answers': ['Cabbage', 'Reddish', 'Zucchini'],
+                  'right_answer': '3'},
+
+                 {'question': 'el ajo is...',
+                  'answers': ['Onion', 'Garlic', 'Broccoli'],
+                  'right_answer': '2'},
+
+                 {'question': 'la berenjena is...',
+                  'answers': ['Eggplant', 'Tomato', 'Carrot'],
+                  'right_answer': '1'},
+
+                 {'question': 'la cebolla is...',
+                  'answers': ['Onion', 'Carrot', 'Reddish'],
+                  'right_answer': '1'},
+
+                 {'question': 'el pimiento is...',
+                  'answers': ['Green bean', 'Bulgarian pepper', 'Artichoke'],
+                  'right_answer': '2'},
+
+                 {'question': 'la remolacha is...',
+                  'answers': ['Eggplant', 'Potato', 'Beet'],
+                  'right_answer': '3'},
+
+                 {'question': 'el maíz is...',
+                  'answers': ['Corn', 'Onion', 'Garlic'],
+                  'right_answer': '1'},
+
+                 {'question': ' la calabaza is...',
+                  'answers': ['Pumpkin', 'Corn', 'Cabbage'],
+                  'right_answer': '1'},
+
+                 {'question': 'las aceitunas are...',
+                  'answers': ['Tomatoes', 'Olives', 'Seeds'],
+                  'right_answer': '2'},
+
+                 {'question': 'el pepino is...',
+                  'answers': ['Cucumber', 'Pumpkin', 'Tomato'],
+                  'right_answer': '1'},
+
+                 {'question': 'el hinojo is...',
+                  'answers': ['Potato', 'Bean', 'Fennel'],
+                  'right_answer': '3'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('vegetables', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'pets':
+        tasks = [{'question': 'El gato is...',
+                  'answers': ['Cat', 'Dog', 'Hamster'],
+                  'right_answer': '1'},
+
+                 {'question': 'El perro is...',
+                  'answers': ['Fish', 'Parrot', 'Dog'],
+                  'right_answer': '3'},
+
+                 {'question': 'El hamster is...',
+                  'answers': ['Rabbit', 'Hamster', 'Tortoise'],
+                  'right_answer': '2'},
+
+                 {'question': 'El perico is...',
+                  'answers': ['Parrot', 'Cat', 'Rabbit'],
+                  'right_answer': '1'},
+
+                 {'question': 'El conejo is...',
+                  'answers': ['Rabbit', 'Cat', 'Dog'],
+                  'right_answer': '1'},
+
+                 {'question': 'La rata is...',
+                  'answers': ['Parrot', 'Rat', 'Hamster'],
+                  'right_answer': '2'},
+
+                 {'question': 'El pez is...',
+                  'answers': ['Hamster', 'Tortoise', 'Fish'],
+                  'right_answer': '3'},
+
+                 {'question': 'La tortuga is...',
+                  'answers': ['Tortoise', 'Cat', 'Snake'],
+                  'right_answer': '1'},
+
+                 {'question': 'El canario is...',
+                  'answers': ['Canary', 'Rabbit', 'Dog'],
+                  'right_answer': '1'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('pets', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'domestic_animals':
+        tasks = [{'question': 'El caballo is...',
+                  'answers': ['Cow', 'Horse', 'Bull'],
+                  'right_answer': '2'},
+
+                 {'question': 'La vaca is...',
+                  'answers': ['Sheep', 'Duck', 'Cow'],
+                  'right_answer': '3'},
+
+                 {'question': 'La cabra is...',
+                  'answers': ['Goose', 'Goat', 'Cow'],
+                  'right_answer': '2'},
+
+                 {'question': 'El ganso is...',
+                  'answers': ['Goose', 'Pig', 'Bull'],
+                  'right_answer': '1'},
+
+                 {'question': 'Un toro is...',
+                  'answers': ['Hen', 'Pig', 'Cow'],
+                  'right_answer': '1'},
+
+                 {'question': 'El cerdo is...',
+                  'answers': ['Cow', 'Pig', 'Sheep'],
+                  'right_answer': '2'},
+
+                 {'question': 'La oveja is...',
+                  'answers': ['Bull', 'Donkey', 'Sheep'],
+                  'right_answer': '3'},
+
+                 {'question': 'La gallina is...',
+                  'answers': ['Hen', 'Goose', 'Donkey'],
+                  'right_answer': '1'},
+
+                 {'question': 'El gallo is...',
+                  'answers': ['Rooster', 'Goat', 'Hen'],
+                  'right_answer': '1'},
+
+                 {'question': 'El pavo is...',
+                  'answers': ['Turkey', 'Hen', 'Rooster'],
+                  'right_answer': '1'},
+
+                 {'question': 'El pato is...',
+                  'answers': ['Duck', 'Horse', 'Sheep'],
+                  'right_answer': '1'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('domestic_animals', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'wild_animals':
+        tasks = [{'question': 'El oso is...',
+                  'answers': ['Fox', 'Bear', 'Hare'],
+                  'right_answer': '2'},
+
+                 {'question': 'El zorro is...',
+                  'answers': ['Beaver', 'Wolf', 'Fox'],
+                  'right_answer': '3'},
+
+                 {'question': 'El lobo is...',
+                  'answers': ['Fox', 'Wolf', 'Bear'],
+                  'right_answer': '2'},
+
+                 {'question': 'El erizo is...',
+                  'answers': ['Hedgehog', 'Beaver', 'Squirrel'],
+                  'right_answer': '1'},
+
+                 {'question': 'La ardilla is...',
+                  'answers': ['Squirrel', 'Hare', 'Bear'],
+                  'right_answer': '1'},
+
+                 {'question': 'La liebre is...',
+                  'answers': ['Fox', 'Hare', 'Wolf'],
+                  'right_answer': '2'},
+
+                 {'question': 'El alce is...',
+                  'answers': ['Squirrel', 'Beaver', 'Moose'],
+                  'right_answer': '3'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('wild_animals', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'exotic_animals':
+        tasks = [{'question': 'El león is...',
+                  'answers': ['Puma', 'Lion', 'panda'],
+                  'right_answer': '2'},
+
+                 {'question': 'El jaguar is...',
+                  'answers': ['Tiger', 'Elephant', 'Jaguar'],
+                  'right_answer': '3'},
+
+                 {'question': 'El leopardo is...',
+                  'answers': ['Monkey', 'Leopard', 'Bear'],
+                  'right_answer': '2'},
+
+                 {'question': 'El mono is...',
+                  'answers': ['Monkey', 'Lion', 'Camel'],
+                  'right_answer': '1'},
+
+                 {'question': 'El puma is...',
+                  'answers': ['Puma', 'Racoon', 'Giraffe'],
+                  'right_answer': '1'},
+
+                 {'question': 'El tigre is...',
+                  'answers': ['Giraffe', 'Tiger', 'Elephant'],
+                  'right_answer': '2'},
+
+                 {'question': 'El panda is...',
+                  'answers': ['Koala', 'Monkey', 'Panda'],
+                  'right_answer': '3'},
+
+                 {'question': 'El camello is...',
+                  'answers': ['Elephant', 'Camel', 'Hippopotamus'],
+                  'right_answer': '2'},
+
+                 {'question': 'El elefante  is...',
+                  'answers': ['Elephant', 'Tiger', 'Racoon'],
+                  'right_answer': '1'},
+
+                 {'question': 'La cebra is...',
+                  'answers': ['Zebra', 'Camel', 'Crocodile'],
+                  'right_answer': '1'},
+
+                 {'question': 'El cocodrilo is...',
+                  'answers': ['Crocodile', 'Camel', 'Racoon'],
+                  'right_answer': '1'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('exotic_animals', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'weather':
+        tasks = [{'question': 'When the Spaniards say "la nieve", it means...',
+                  'answers': ['It`s snowy', 'It`s rainy', 'It`s hailing'],
+                  'right_answer': '1'},
+
+                 {'question': 'When the Spaniards say "la luvia", it means...',
+                  'answers': ['It`s sunny', 'It`s foggy', 'It`s rainy'],
+                  'right_answer': '3'},
+
+                 {'question': 'Está nublado describes...',
+                  'answers': ['Sunny weather', 'Cloudy weather', 'Partly cloudy weather'],
+                  'right_answer': '2'},
+
+                 {'question': 'Está despejado describes...',
+                  'answers': ['Foggy weather', 'Snowy weather', 'Sunny weather'],
+                  'right_answer': '3'},
+
+                 {'question': 'Hace viento means...',
+                  'answers': ['Today is windy', 'It`s hot today', 'It`s freezy today'],
+                  'right_answer': '1'},
+
+                 {'question': 'Hace mucho frío means...',
+                  'answers': ['It`s brass monkey weather', 'It`s raining cats and dogs',
+                              'It`s a perfect weather, beautiful day'],
+                  'right_answer': '1'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('weather', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'weekdays':
+        tasks = [{'question': 'El lunes is...',
+                  'answers': ['Monday', 'Tuesday', 'Thursday'],
+                  'right_answer': '1'},
+
+                 {'question': 'El martes is...',
+                  'answers': ['Sunday', 'Wednesday', 'Tuesday'],
+                  'right_answer': '3'},
+
+                 {'question': 'El miércoles is...',
+                  'answers': ['Saturday', 'Wednesday', 'Friday'],
+                  'right_answer': '2'},
+
+                 {'question': 'El jueves is...',
+                  'answers': ['Thursday', 'Sunday', 'Monday'],
+                  'right_answer': '1'},
+
+                 {'question': 'El viernes is...',
+                  'answers': ['Friday', 'Wednesday', 'Sunday'],
+                  'right_answer': '1'},
+
+                 {'question': 'El sábado is...',
+                  'answers': ['Tuesday', 'Monday', 'Saturday'],
+                  'right_answer': '3'},
+
+                 {'question': 'El domingo is...',
+                  'answers': ['Saturday', 'Thursday', 'Sunday'],
+                  'right_answer': '3'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('weekdays', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == 'colours':
+        tasks = [{'question': 'Blanco is...',
+                  'answers': ['White 🕊️', 'Black 🍳', 'Yellow ⭐'],
+                  'right_answer': '1'},
+
+                 {'question': 'Negro is...',
+                  'answers': ['Grey 🐘', 'Brown 🥥', 'Black 🌑'],
+                  'right_answer': '3'},
+
+                 {'question': 'Amarillo is...',
+                  'answers': ['Red ❤️', 'Yellow ⭐', 'Pink 🌸'],
+                  'right_answer': '2'},
+
+                 {'question': 'Verde is...',
+                  'answers': ['Green 🍀', 'Blue 💎', 'Orange 🥕'],
+                  'right_answer': '1'},
+
+                 {'question': 'Azul is...',
+                  'answers': ['Blue 🐬', 'Brown 🐻', 'Beige 🍯'],
+                  'right_answer': '1'},
+
+                 {'question': 'Marrón is...',
+                  'answers': ['Green 🥝', 'Violet 🔮', 'Brown 🦔'],
+                  'right_answer': '3'},
+
+                 {'question': 'Lavanda is...',
+                  'answers': ['Purple 🍇', 'Violet 🔮', 'Lavender 🦄'],
+                  'right_answer': '3'},
+
+                 {'question': 'Rosado is...',
+                  'answers': ['Pink 🌷', 'Orange 🍊', 'Blue 💎'],
+                  'right_answer': '1'},
+
+                 {'question': 'Rojo is...',
+                  'answers': ['Red 🍒', 'Beige 🍦', 'Green 🍏'],
+                  'right_answer': '1'},
+
+                 {'question': 'Anaranjado is...',
+                  'answers': ['Orange 🍑', 'Yellow ⭐', 'Beige 🥞'],
+                  'right_answer': '1'},
+                 ]
+        task = random.choice(tasks)
+        message = f'{task["question"]}'
+        answers = task["answers"]
+        keyboard_a = types.InlineKeyboardMarkup()
+        for i in range(len(answers)):
+            answer = types.InlineKeyboardButton(text=answers[i], callback_data=str(i + 1))
+            keyboard_a.add(answer)
+        exit = types.InlineKeyboardButton('Exit', callback_data='starting')
+        keyboard_a.add(exit)
+        user_id = callback.from_user.id
+        memory[user_id] = ('colours', task['right_answer'])
+        bot.send_message(callback.message.chat.id, message, reply_markup=keyboard_a)
+    elif callback.data == memory[callback.from_user.id][1]: #id того пользователя, кто пишет. Ключ словаря memory, котрый дает кортеж из темы и ответа пользователя
+        keyboard_a = types.InlineKeyboardMarkup() #по индексу 1 верху получаем ответ пользователя, по индексу 0 тему, чтоб помнил топик
+        result = memory[callback.from_user.id][0]
+        next_task = types.InlineKeyboardButton(text='Next question', callback_data=result)
+        keyboard_a.add(next_task)
+        bot.send_message(callback.message.chat.id, 'Great!', reply_markup=keyboard_a)
+    else:
+        bot.send_message(callback.message.chat.id, 'Please, use /help')
+
+if __name__ == "__main__":
+        while True:
+            try:
+                bot.polling(none_stop=True)
+            except Exception as e:
+                print(e)
